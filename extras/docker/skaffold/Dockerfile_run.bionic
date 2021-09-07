@@ -1,0 +1,22 @@
+# We will getting debs from the vpp_base image
+ARG VPP_BASE
+FROM $VPP_BASE as vpp_base
+
+FROM ubuntu:bionic
+#copy the agent
+COPY extras/scripts/vpp_agent.sh  .
+# install debs from the VPP_BASE
+# apt install will install the required dependencies
+COPY --from=vpp_base /vpp/build-root/*.deb .
+RUN apt-get update && \
+    apt install -y \
+        iproute2 \
+        ./libvppinfra_*.deb \
+        ./vpp_*.deb \
+        ./vpp-plugin-*.deb \
+        ./libvppinfra-dev_*.deb \
+        ./vpp-dev_*.deb \
+        ./python*.deb
+RUN apt-get -y clean
+RUN rm ./*.deb
+CMD ["/usr/bin/vpp","-c","/etc/vpp/startup.conf"]

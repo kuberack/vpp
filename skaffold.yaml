@@ -1,0 +1,22 @@
+apiVersion: skaffold/v2beta18
+kind: Config
+build:
+  artifacts:
+  - image: gcr.io/evident-healer-254915/vpp
+    requires:
+    - image: gcr.io/evident-healer-254915/vpp_base
+      alias: VPP_BASE
+    context: .
+    docker:
+      dockerfile: extras/docker/skaffold/Dockerfile_run.bionic
+  - image: gcr.io/evident-healer-254915/vpp_base
+    context: .
+    docker:
+      dockerfile: extras/docker/skaffold/Dockerfile_build.bionic
+  local:
+    useBuildkit: true
+deploy:
+  kubectl:
+    manifests:
+    - extras/docker/skaffold/*.yaml
+
